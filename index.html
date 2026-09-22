@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前后端分离计算器</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+
+    <!-- 计算器主体 -->
+    <div class="calculator">
+        <h1>计算器</h1>
+
+        <!-- 表达式与结果显示 -->
+        <div class="display">
+            <div class="expression" id="expression">&nbsp;</div>
+            <div class="result" id="result">&nbsp;</div>
+            <div class="error" id="error"></div>
+        </div>
+
+        <!-- 按钮区：界面显示 × ÷，发送给后端时转换为 * / -->
+        <div class="buttons">
+            <button class="btn fn" data-action="clear">C</button>
+            <button class="btn fn" data-action="backspace">⌫</button>
+            <button class="btn fn" data-action="input" data-value="(">(</button>
+            <button class="btn fn" data-action="input" data-value=")">)</button>
+
+            <button class="btn op" data-action="input" data-value="÷">÷</button>
+            <button class="btn num" data-value="7">7</button>
+            <button class="btn num" data-value="8">8</button>
+            <button class="btn num" data-value="9">9</button>
+
+            <button class="btn op" data-action="input" data-value="×">×</button>
+            <button class="btn num" data-value="4">4</button>
+            <button class="btn num" data-value="5">5</button>
+            <button class="btn num" data-value="6">6</button>
+
+            <button class="btn op" data-action="input" data-value="-">-</button>
+            <button class="btn num" data-value="1">1</button>
+            <button class="btn num" data-value="2">2</button>
+            <button class="btn num" data-value="3">3</button>
+
+            <button class="btn op" data-action="input" data-value="+">+</button>
+            <button class="btn num" data-value="0">0</button>
+            <button class="btn num" data-value=".">.</button>
+            <button class="btn eq" data-action="calculate">=</button>
+        </div>
+    </div>
+
+    <!-- 历史记录面板 -->
+    <div class="history">
+        <div class="history-header">
+            <h2>计算历史</h2>
+            <button id="clear-history" class="clear-btn">清空全部</button>
+        </div>
+        <ul id="history-list"></ul>
+        <div id="history-empty" class="history-empty">暂无历史记录</div>
+    </div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
