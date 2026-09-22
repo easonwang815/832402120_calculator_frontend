@@ -2,7 +2,12 @@
  * API 请求封装：前后端通过 HTTP + JSON 通信。
  * 前端只发表达式，不参与任何计算。
  */
-const API_BASE = 'http://localhost:8080/api';
+const apiBaseMeta = document.querySelector('meta[name="api-base"]');
+const configuredApiBase = apiBaseMeta ? apiBaseMeta.content.trim() : '';
+const isLocal = window.location.hostname === 'localhost'
+    || window.location.hostname === '127.0.0.1';
+const API_BASE = (configuredApiBase || (isLocal ? 'http://localhost:8080/api' : '/api'))
+    .replace(/\/$/, '');
 
 async function apiFetch(path, options) {
     const res = await fetch(API_BASE + path, options);
@@ -10,7 +15,13 @@ async function apiFetch(path, options) {
     try {
         json = await res.json();
     } catch (e) {
-        json = { success: false, message: 'Network error' };
+        return {
+            success: false,
+            message: res.ok ? 'Invalid server response' : 'Request failed'
+        };
+    }
+    if (!res.ok && json.success !== false) {
+        return { success: false, message: json.message || 'Request failed' };
     }
     return json;
 }

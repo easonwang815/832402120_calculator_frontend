@@ -67,23 +67,17 @@ python3 -m http.server 8000
 
 浏览器访问：`http://localhost:8000`
 
-**方式二：直接打开**
-
-直接用浏览器打开 `index.html` 文件（file:// 方式）也可运行。
-
-> 使用前请确保**后端服务已启动**（见后端仓库 README「安装与启动」）。
+> 使用前请确保**后端服务已启动**（见后端仓库 README「安装与启动」）。建议使用静态服务器启动；`file://` 方式会受到浏览器跨域策略限制。
 
 ## 6. 与后端连接
 
-前端通过 HTTP API 与后端通信，API 地址在 `js/api.js` 中定义：
+前端通过 HTTP API 与后端通信。页面会按以下顺序确定 API 地址：
 
-```js
-const API_BASE = 'http://localhost:8080/api';
-```
+1. `index.html` 中 `<meta name="api-base">` 配置的地址；
+2. 本地访问时默认使用 `http://localhost:8080/api`；
+3. 公网同域部署时默认使用 `/api`。
 
-- 后端默认端口 8080，地址不同时修改 `API_BASE` 即可
-- 跨域（CORS）已由后端 `WebConfig` 配置允许，前端无需额外设置
-- 部署时将该地址改为后端实际部署地址
+前后端分别部署在不同域名时，将 `index.html` 中的 `api-base` 改为完整后端地址，并在后端设置环境变量 `CORS_ALLOWED_ORIGINS` 为前端域名。
 
 ## 7. 项目结构
 

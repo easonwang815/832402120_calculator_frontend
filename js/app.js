@@ -9,8 +9,12 @@
     const errorEl = document.getElementById('error');
     const historyList = document.getElementById('history-list');
     const historyEmpty = document.getElementById('history-empty');
+    const historyStatus = document.getElementById('history-status');
+    const clearHistoryButton = document.getElementById('clear-history');
+    const calculateButton = document.getElementById('calculate-button');
 
     let expression = '';
+    let isCalculating = false;
 
     /** 显示表达式（界面用 × ÷，发送给后端时转 * /） */
     function renderExpression() {
@@ -50,10 +54,15 @@
 
     /** 发起计算请求（后端计算并保存历史） */
     async function doCalculate() {
+        if (isCalculating) {
+            return;
+        }
         if (!expression) {
             errorEl.textContent = '请输入表达式';
             return;
         }
+        isCalculating = true;
+        calculateButton.disabled = true;
         const apiExpr = toApiExpression(expression);
         errorEl.textContent = '计算中...';
         try {
@@ -69,6 +78,9 @@
         } catch (e) {
             resultEl.textContent = '\u00a0';
             errorEl.textContent = '无法连接后端服务';
+        } finally {
+            isCalculating = false;
+            calculateButton.disabled = false;
         }
     }
 
@@ -78,16 +90,22 @@
             const resp = await getHistory();
             if (!resp.success) {
                 historyEmpty.textContent = '加载历史失败';
+                historyEmpty.style.display = 'block';
+                historyStatus.textContent = resp.message || '加载历史失败';
                 return;
             }
+            historyStatus.textContent = '';
             renderHistory(resp.data || []);
         } catch (e) {
             historyEmpty.textContent = '无法连接后端服务';
+            historyEmpty.style.display = 'block';
+            historyStatus.textContent = '无法连接后端服务';
         }
     }
 
     function renderHistory(records) {
-        historyList.innerHTML = '';
+        historyList.replaceChildren();
+        historyEmpty.textContent = '暂无历史记录';
         if (!records.length) {
             historyEmpty.style.display = 'block';
             return;
@@ -99,8 +117,13 @@
 
             const math = document.createElement('div');
             math.className = 'history-math';
-            math.innerHTML = toDisplayExpression(record.expression)
-                + ' = <span class="history-result">' + record.result + '</span>';
+            math.appendChild(document.createTextNode(
+                toDisplayExpression(record.expression) + ' = '
+            ));
+            const historyResult = document.createElement('span');
+            historyResult.className = 'history-result';
+            historyResult.textContent = record.result;
+            math.appendChild(historyResult);
 
             const time = document.createElement('div');
             time.className = 'history-time';
@@ -109,8 +132,21 @@
             const del = document.createElement('button');
             del.className = 'delete-btn';
             del.textContent = '删除';
-            del.addEventListener('click', function () {
-                deleteHistory(record.id).then(loadHistory);
+            del.addEventListener('click', async function () {
+                del.disabled = true;
+                historyStatus.textContent = '正在删除...';
+                try {
+                    const resp = await deleteHistory(record.id);
+                    if (!resp.success) {
+                        historyStatus.textContent = resp.message || '删除失败';
+                        return;
+                    }
+                    await loadHistory();
+                } catch (e) {
+                    historyStatus.textContent = '无法连接后端服务';
+                } finally {
+                    del.disabled = false;
+                }
             });
 
             const left = document.createElement('div');
@@ -130,7 +166,9 @@
 
     /** 后端时间 "2026-10-01T10:20:00" → "2026-10-01 10:20" */
     function formatTime(iso) {
-        if (!iso) return '';
+        if (!iso) {
+            return '';
+        }
         return iso.replace('T', ' ').substring(0, 16);
     }
 
@@ -150,9 +188,22 @@
         });
     });
 
-    document.getElementById('clear-history').addEventListener('click', function () {
+    clearHistoryButton.addEventListener('click', async function () {
         if (confirm('确定清空全部计算历史？')) {
-            clearHistory().then(loadHistory);
+            clearHistoryButton.disabled = true;
+            historyStatus.textContent = '正在清空...';
+            try {
+                const resp = await clearHistory();
+                if (!resp.success) {
+                    historyStatus.textContent = resp.message || '清空失败';
+                    return;
+                }
+                await loadHistory();
+            } catch (e) {
+                historyStatus.textContent = '无法连接后端服务';
+            } finally {
+                clearHistoryButton.disabled = false;
+            }
         }
     });
 
