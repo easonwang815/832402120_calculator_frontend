@@ -35,9 +35,14 @@ async function calculate(expression) {
     });
 }
 
-/** 查询历史：GET /api/history */
-async function getHistory() {
-    return apiFetch('/history');
+/** 搜索并分页查询历史：GET /api/history */
+async function getHistory(keyword, page, size) {
+    const params = new URLSearchParams({
+        keyword: keyword || '',
+        page: String(page),
+        size: String(size)
+    });
+    return apiFetch('/history?' + params.toString());
 }
 
 /** 删除指定历史：DELETE /api/history/{id} */
@@ -48,4 +53,13 @@ async function deleteHistory(id) {
 /** 清空全部历史：DELETE /api/history（加分项） */
 async function clearHistory() {
     return apiFetch('/history', { method: 'DELETE' });
+}
+
+/** 进制转换：POST /api/convert */
+async function convertBase(value, fromBase, toBase) {
+    return apiFetch('/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value, fromBase, toBase })
+    });
 }

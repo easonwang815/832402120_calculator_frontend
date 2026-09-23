@@ -12,9 +12,26 @@
     const historyStatus = document.getElementById('history-status');
     const clearHistoryButton = document.getElementById('clear-history');
     const calculateButton = document.getElementById('calculate-button');
+    const historyKeyword = document.getElementById('history-keyword');
+    const searchHistoryButton = document.getElementById('search-history');
+    const previousPageButton = document.getElementById('previous-page');
+    const nextPageButton = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
+    const historyPagination = document.getElementById('history-pagination');
+    const conversionValue = document.getElementById('conversion-value');
+    const fromBase = document.getElementById('from-base');
+    const toBase = document.getElementById('to-base');
+    const swapBasesButton = document.getElementById('swap-bases');
+    const convertButton = document.getElementById('convert-button');
+    const conversionResult = document.getElementById('conversion-result');
+    const conversionError = document.getElementById('conversion-error');
 
     let expression = '';
     let isCalculating = false;
+    let currentPage = 0;
+    let totalPages = 0;
+    let currentKeyword = '';
+    const PAGE_SIZE = 5;
 
     /** 显示表达式（界面用 × ÷，发送给后端时转 * /） */
     function renderExpression() {
@@ -85,22 +102,45 @@
     }
 
     /** 加载并渲染历史（数据来自后端数据库） */
-    async function loadHistory() {
+    async function loadHistory(page) {
+        if (Number.isInteger(page)) {
+            currentPage = Math.max(0, page);
+        }
+        historyStatus.textContent = '正在加载...';
         try {
-            const resp = await getHistory();
+            const resp = await getHistory(currentKeyword, currentPage, PAGE_SIZE);
             if (!resp.success) {
                 historyEmpty.textContent = '加载历史失败';
                 historyEmpty.style.display = 'block';
                 historyStatus.textContent = resp.message || '加载历史失败';
                 return;
             }
-            historyStatus.textContent = '';
-            renderHistory(resp.data || []);
+            const data = resp.data || {};
+            const records = data.records || [];
+            totalPages = data.totalPages || 0;
+            if (!records.length && currentPage > 0 && currentPage >= totalPages) {
+                currentPage = Math.max(0, totalPages - 1);
+                await loadHistory(currentPage);
+                return;
+            }
+            historyStatus.textContent = data.totalElements
+                ? '共 ' + data.totalElements + ' 条记录'
+                : '';
+            renderHistory(records);
+            renderPagination();
         } catch (e) {
             historyEmpty.textContent = '无法连接后端服务';
             historyEmpty.style.display = 'block';
             historyStatus.textContent = '无法连接后端服务';
         }
+    }
+
+    function renderPagination() {
+        const displayPage = totalPages === 0 ? 0 : currentPage + 1;
+        pageInfo.textContent = '第 ' + displayPage + ' / ' + totalPages + ' 页';
+        previousPageButton.disabled = currentPage <= 0;
+        nextPageButton.disabled = totalPages === 0 || currentPage >= totalPages - 1;
+        historyPagination.style.display = totalPages > 1 ? 'flex' : 'none';
     }
 
     function renderHistory(records) {
@@ -141,7 +181,7 @@
                         historyStatus.textContent = resp.message || '删除失败';
                         return;
                     }
-                    await loadHistory();
+                    await loadHistory(currentPage);
                 } catch (e) {
                     historyStatus.textContent = '无法连接后端服务';
                 } finally {
@@ -198,7 +238,7 @@
                     historyStatus.textContent = resp.message || '清空失败';
                     return;
                 }
-                await loadHistory();
+                await loadHistory(0);
             } catch (e) {
                 historyStatus.textContent = '无法连接后端服务';
             } finally {
@@ -207,10 +247,73 @@
         }
     });
 
+    function searchHistory() {
+        currentKeyword = historyKeyword.value.trim();
+        loadHistory(0);
+    }
+
+    searchHistoryButton.addEventListener('click', searchHistory);
+    historyKeyword.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            searchHistory();
+            event.preventDefault();
+        }
+    });
+    previousPageButton.addEventListener('click', function () {
+        loadHistory(currentPage - 1);
+    });
+    nextPageButton.addEventListener('click', function () {
+        loadHistory(currentPage + 1);
+    });
+
+    async function doConvert() {
+        const value = conversionValue.value.trim();
+        if (!value) {
+            conversionError.textContent = '请输入待转换整数';
+            return;
+        }
+        convertButton.disabled = true;
+        conversionResult.textContent = '';
+        conversionError.textContent = '转换中...';
+        try {
+            const resp = await convertBase(
+                value, Number(fromBase.value), Number(toBase.value)
+            );
+            if (!resp.success) {
+                conversionError.textContent = resp.message || '转换失败';
+                return;
+            }
+            conversionResult.textContent = resp.data.result;
+            conversionError.textContent = '';
+        } catch (e) {
+            conversionError.textContent = '无法连接后端服务';
+        } finally {
+            convertButton.disabled = false;
+        }
+    }
+
+    convertButton.addEventListener('click', doConvert);
+    conversionValue.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            doConvert();
+            event.preventDefault();
+        }
+    });
+    swapBasesButton.addEventListener('click', function () {
+        const previousFromBase = fromBase.value;
+        fromBase.value = toBase.value;
+        toBase.value = previousFromBase;
+        conversionResult.textContent = '';
+        conversionError.textContent = '';
+    });
+
     // 键盘输入（加分项：键盘快捷键）
     document.addEventListener('keydown', function (e) {
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) {
+            return;
+        }
         const key = e.key;
-        if (/^[0-9.+\-*/().]$/.test(key)) {
+        if (/^[0-9.+\-*/().^]$/.test(key)) {
             input(key);
             e.preventDefault();
         } else if (key === 'Enter') {
@@ -224,5 +327,5 @@
     });
 
     // 页面加载时从后端拉取历史
-    loadHistory();
+    loadHistory(0);
 })();
