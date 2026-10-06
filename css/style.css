@@ -22,7 +22,7 @@ body {
     max-width: 1120px;
 }
 
-/* ============ 计算器 ============ */
+/* Calculator */
 .calculator {
     background: #ffffff;
     border-radius: 16px;
@@ -69,7 +69,7 @@ body {
     min-height: 18px;
 }
 
-/* ============ 按钮 ============ */
+/* Buttons */
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -150,7 +150,7 @@ body {
     background: #1d4ed8;
 }
 
-/* ============ 历史面板 ============ */
+/* History */
 .history {
     background: #ffffff;
     border-radius: 16px;
@@ -299,7 +299,7 @@ body {
     opacity: 0.45;
 }
 
-/* ============ 进制转换 ============ */
+/* Base conversion */
 .converter {
     background: #ffffff;
     border-radius: 16px;

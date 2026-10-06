@@ -1,28 +1,28 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 公网前后端分域部署时，将 content 改为后端地址；同域部署可留空。 -->
+    <!-- Leave the API address empty for the current same-server deployment. -->
     <meta name="api-base" content="">
-    <title>前后端分离计算器</title>
+    <title>Frontend-Backend Calculator</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="app">
 
-    <!-- 计算器主体 -->
+    <!-- Calculator panel. -->
     <div class="calculator">
-        <h1>计算器</h1>
+        <h1>Calculator</h1>
 
-        <!-- 表达式与结果显示 -->
+        <!-- Expression, result and error message. -->
         <div class="display">
             <div class="expression" id="expression">&nbsp;</div>
             <div class="result" id="result" aria-live="polite">&nbsp;</div>
             <div class="error" id="error" role="alert" aria-live="assertive"></div>
         </div>
 
-        <div class="scientific-buttons" aria-label="科学计算">
+        <div class="scientific-buttons" aria-label="Scientific functions">
             <button class="btn sci" data-action="input" data-value="sin(">sin</button>
             <button class="btn sci" data-action="input" data-value="cos(">cos</button>
             <button class="btn sci" data-action="input" data-value="tan(">tan</button>
@@ -30,7 +30,7 @@
             <button class="btn sci" data-action="input" data-value="^">xʸ</button>
         </div>
 
-        <!-- 按钮区：界面显示 × ÷，发送给后端时转换为 * / -->
+        <!-- Display multiplication and division symbols on the buttons. -->
         <div class="buttons">
             <button class="btn fn" data-action="clear">C</button>
             <button class="btn fn" data-action="backspace">⌫</button>
@@ -59,55 +59,55 @@
         </div>
     </div>
 
-    <!-- 历史记录面板 -->
+    <!-- History panel. -->
     <div class="history">
         <div class="history-header">
-            <h2>计算历史</h2>
-            <button id="clear-history" class="clear-btn">清空全部</button>
+            <h2>Calculation History</h2>
+            <button id="clear-history" class="clear-btn">Clear All</button>
         </div>
         <div class="history-search">
             <input id="history-keyword" type="search" maxlength="100"
-                   placeholder="搜索表达式或结果" aria-label="搜索历史">
-            <button id="search-history" type="button">搜索</button>
+                   placeholder="Search expression or result" aria-label="Search history">
+            <button id="search-history" type="button">Search</button>
         </div>
         <div id="history-status" class="history-status" role="status" aria-live="polite"></div>
         <ul id="history-list"></ul>
-        <div id="history-empty" class="history-empty">暂无历史记录</div>
+        <div id="history-empty" class="history-empty">No history yet</div>
         <div id="history-pagination" class="pagination">
-            <button id="previous-page" type="button">上一页</button>
-            <span id="page-info">第 1 / 1 页</span>
-            <button id="next-page" type="button">下一页</button>
+            <button id="previous-page" type="button">Previous</button>
+            <span id="page-info">Page 1 / 1</span>
+            <button id="next-page" type="button">Next</button>
         </div>
     </div>
 
-    <!-- 进制转换仍由后端完成 -->
+    <!-- Number-base conversion is done by the backend. -->
     <div class="converter">
-        <h2>进制转换</h2>
-        <label for="conversion-value">待转换整数</label>
+        <h2>Base Conversion</h2>
+        <label for="conversion-value">Integer to convert</label>
         <input id="conversion-value" type="text" maxlength="1024"
-               placeholder="例如：255 或 FF">
+               placeholder="For example: 255 or FF">
         <div class="base-selectors">
             <label>
-                从
+                From
                 <select id="from-base">
-                    <option value="2">2 进制</option>
-                    <option value="8">8 进制</option>
-                    <option value="10" selected>10 进制</option>
-                    <option value="16">16 进制</option>
+                    <option value="2">Base 2</option>
+                    <option value="8">Base 8</option>
+                    <option value="10" selected>Base 10</option>
+                    <option value="16">Base 16</option>
                 </select>
             </label>
-            <button id="swap-bases" class="swap-btn" type="button" aria-label="交换进制">⇄</button>
+            <button id="swap-bases" class="swap-btn" type="button" aria-label="Swap bases">⇄</button>
             <label>
-                到
+                To
                 <select id="to-base">
-                    <option value="2">2 进制</option>
-                    <option value="8">8 进制</option>
-                    <option value="10">10 进制</option>
-                    <option value="16" selected>16 进制</option>
+                    <option value="2">Base 2</option>
+                    <option value="8">Base 8</option>
+                    <option value="10">Base 10</option>
+                    <option value="16" selected>Base 16</option>
                 </select>
             </label>
         </div>
-        <button id="convert-button" class="convert-btn" type="button">转换</button>
+        <button id="convert-button" class="convert-btn" type="button">Convert</button>
         <div id="conversion-result" class="conversion-result" aria-live="polite"></div>
         <div id="conversion-error" class="error" role="alert" aria-live="assertive"></div>
     </div>

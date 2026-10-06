@@ -1,6 +1,4 @@
-/**
- * 前端交互逻辑：按钮输入、发起计算请求、渲染结果与历史、错误提示。
- */
+/** Handles input, API requests, results and history. */
 (function () {
     'use strict';
 
@@ -33,12 +31,12 @@
     let currentKeyword = '';
     const PAGE_SIZE = 5;
 
-    /** 显示表达式（界面用 × ÷，发送给后端时转 * /） */
+    /** Shows the expression entered by the user. */
     function renderExpression() {
         expressionEl.textContent = expression || '\u00a0';
     }
 
-    /** 输入字符 */
+    /** Adds a character to the expression. */
     function input(char) {
         expression += char;
         renderExpression();
@@ -50,38 +48,38 @@
         errorEl.textContent = '';
     }
 
-    /** 退格 */
+    /** Removes the last character. */
     function backspace() {
         expression = expression.slice(0, -1);
         renderExpression();
         clearResult();
     }
 
-    /** 清空 */
+    /** Clears the current expression and result. */
     function clearAll() {
         expression = '';
         renderExpression();
         clearResult();
     }
 
-    /** 界面符号 → API 符号 */
+    /** Changes the displayed symbols to API operators. */
     function toApiExpression(expr) {
         return expr.replace(/×/g, '*').replace(/÷/g, '/');
     }
 
-    /** 发起计算请求（后端计算并保存历史） */
+    /** Asks the backend to calculate and save the result. */
     async function doCalculate() {
         if (isCalculating) {
             return;
         }
         if (!expression) {
-            errorEl.textContent = '请输入表达式';
+            errorEl.textContent = 'Please enter an expression';
             return;
         }
         isCalculating = true;
         calculateButton.disabled = true;
         const apiExpr = toApiExpression(expression);
-        errorEl.textContent = '计算中...';
+        errorEl.textContent = 'Calculating...';
         try {
             const resp = await calculate(apiExpr);
             if (resp.success) {
@@ -90,29 +88,29 @@
                 await loadHistory();
             } else {
                 resultEl.textContent = '\u00a0';
-                errorEl.textContent = resp.message || '计算失败';
+                errorEl.textContent = resp.message || 'Calculation failed';
             }
         } catch (e) {
             resultEl.textContent = '\u00a0';
-            errorEl.textContent = '无法连接后端服务';
+            errorEl.textContent = 'Cannot connect to the backend';
         } finally {
             isCalculating = false;
             calculateButton.disabled = false;
         }
     }
 
-    /** 加载并渲染历史（数据来自后端数据库） */
+    /** Reads a history page from the backend database. */
     async function loadHistory(page) {
         if (Number.isInteger(page)) {
             currentPage = Math.max(0, page);
         }
-        historyStatus.textContent = '正在加载...';
+        historyStatus.textContent = 'Loading...';
         try {
             const resp = await getHistory(currentKeyword, currentPage, PAGE_SIZE);
             if (!resp.success) {
-                historyEmpty.textContent = '加载历史失败';
+                historyEmpty.textContent = 'Could not load history';
                 historyEmpty.style.display = 'block';
-                historyStatus.textContent = resp.message || '加载历史失败';
+                historyStatus.textContent = resp.message || 'Could not load history';
                 return;
             }
             const data = resp.data || {};
@@ -124,20 +122,20 @@
                 return;
             }
             historyStatus.textContent = data.totalElements
-                ? '共 ' + data.totalElements + ' 条记录'
+                ? 'Records: ' + data.totalElements
                 : '';
             renderHistory(records);
             renderPagination();
         } catch (e) {
-            historyEmpty.textContent = '无法连接后端服务';
+            historyEmpty.textContent = 'Cannot connect to the backend';
             historyEmpty.style.display = 'block';
-            historyStatus.textContent = '无法连接后端服务';
+            historyStatus.textContent = 'Cannot connect to the backend';
         }
     }
 
     function renderPagination() {
         const displayPage = totalPages === 0 ? 0 : currentPage + 1;
-        pageInfo.textContent = '第 ' + displayPage + ' / ' + totalPages + ' 页';
+        pageInfo.textContent = 'Page ' + displayPage + ' / ' + totalPages;
         previousPageButton.disabled = currentPage <= 0;
         nextPageButton.disabled = totalPages === 0 || currentPage >= totalPages - 1;
         historyPagination.style.display = totalPages > 1 ? 'flex' : 'none';
@@ -145,7 +143,7 @@
 
     function renderHistory(records) {
         historyList.replaceChildren();
-        historyEmpty.textContent = '暂无历史记录';
+        historyEmpty.textContent = 'No history yet';
         if (!records.length) {
             historyEmpty.style.display = 'block';
             return;
@@ -171,19 +169,19 @@
 
             const del = document.createElement('button');
             del.className = 'delete-btn';
-            del.textContent = '删除';
+            del.textContent = 'Delete';
             del.addEventListener('click', async function () {
                 del.disabled = true;
-                historyStatus.textContent = '正在删除...';
+                historyStatus.textContent = 'Deleting...';
                 try {
                     const resp = await deleteHistory(record.id);
                     if (!resp.success) {
-                        historyStatus.textContent = resp.message || '删除失败';
+                        historyStatus.textContent = resp.message || 'Could not delete the record';
                         return;
                     }
                     await loadHistory(currentPage);
                 } catch (e) {
-                    historyStatus.textContent = '无法连接后端服务';
+                    historyStatus.textContent = 'Cannot connect to the backend';
                 } finally {
                     del.disabled = false;
                 }
@@ -199,12 +197,12 @@
         });
     }
 
-    /** 历史记录里的 * / 也显示为 × ÷，保持一致 */
+    /** Uses the same operator symbols in the history and calculator. */
     function toDisplayExpression(expr) {
         return expr.replace(/\*/g, '×').replace(/\//g, '÷');
     }
 
-    /** 后端时间 "2026-10-01T10:20:00" → "2026-10-01 10:20" */
+    /** Shows the date and time without the seconds. */
     function formatTime(iso) {
         if (!iso) {
             return '';
@@ -212,7 +210,7 @@
         return iso.replace('T', ' ').substring(0, 16);
     }
 
-    /** 按钮事件绑定 */
+    /** Connects the calculator buttons to their actions. */
     document.querySelectorAll('.btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const action = btn.dataset.action;
@@ -229,18 +227,18 @@
     });
 
     clearHistoryButton.addEventListener('click', async function () {
-        if (confirm('确定清空全部计算历史？')) {
+        if (confirm('Clear all calculation history?')) {
             clearHistoryButton.disabled = true;
-            historyStatus.textContent = '正在清空...';
+            historyStatus.textContent = 'Clearing...';
             try {
                 const resp = await clearHistory();
                 if (!resp.success) {
-                    historyStatus.textContent = resp.message || '清空失败';
+                    historyStatus.textContent = resp.message || 'Could not clear history';
                     return;
                 }
                 await loadHistory(0);
             } catch (e) {
-                historyStatus.textContent = '无法连接后端服务';
+                historyStatus.textContent = 'Cannot connect to the backend';
             } finally {
                 clearHistoryButton.disabled = false;
             }
@@ -269,24 +267,24 @@
     async function doConvert() {
         const value = conversionValue.value.trim();
         if (!value) {
-            conversionError.textContent = '请输入待转换整数';
+            conversionError.textContent = 'Please enter an integer';
             return;
         }
         convertButton.disabled = true;
         conversionResult.textContent = '';
-        conversionError.textContent = '转换中...';
+        conversionError.textContent = 'Converting...';
         try {
             const resp = await convertBase(
                 value, Number(fromBase.value), Number(toBase.value)
             );
             if (!resp.success) {
-                conversionError.textContent = resp.message || '转换失败';
+                conversionError.textContent = resp.message || 'Conversion failed';
                 return;
             }
             conversionResult.textContent = resp.data.result;
             conversionError.textContent = '';
         } catch (e) {
-            conversionError.textContent = '无法连接后端服务';
+            conversionError.textContent = 'Cannot connect to the backend';
         } finally {
             convertButton.disabled = false;
         }
@@ -307,7 +305,7 @@
         conversionError.textContent = '';
     });
 
-    // 键盘输入（加分项：键盘快捷键）
+    // Handle keyboard shortcuts.
     document.addEventListener('keydown', function (e) {
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) {
             return;
@@ -326,6 +324,6 @@
         }
     });
 
-    // 页面加载时从后端拉取历史
+    // Read history when the page opens.
     loadHistory(0);
 })();

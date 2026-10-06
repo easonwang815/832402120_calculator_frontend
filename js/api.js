@@ -1,7 +1,4 @@
-/**
- * API 请求封装：前后端通过 HTTP + JSON 通信。
- * 前端只发表达式，不参与任何计算。
- */
+/** Sends HTTP requests to the backend. The frontend does not calculate answers. */
 const apiBaseMeta = document.querySelector('meta[name="api-base"]');
 const configuredApiBase = apiBaseMeta ? apiBaseMeta.content.trim() : '';
 const isLocal = window.location.hostname === 'localhost'
@@ -26,7 +23,7 @@ async function apiFetch(path, options) {
     return json;
 }
 
-/** 计算：POST /api/calculate */
+/** Calculates an expression. */
 async function calculate(expression) {
     return apiFetch('/calculate', {
         method: 'POST',
@@ -35,7 +32,7 @@ async function calculate(expression) {
     });
 }
 
-/** 搜索并分页查询历史：GET /api/history */
+/** Searches and reads a history page. */
 async function getHistory(keyword, page, size) {
     const params = new URLSearchParams({
         keyword: keyword || '',
@@ -45,17 +42,17 @@ async function getHistory(keyword, page, size) {
     return apiFetch('/history?' + params.toString());
 }
 
-/** 删除指定历史：DELETE /api/history/{id} */
+/** Deletes one history record. */
 async function deleteHistory(id) {
     return apiFetch('/history/' + id, { method: 'DELETE' });
 }
 
-/** 清空全部历史：DELETE /api/history（加分项） */
+/** Clears all history records. */
 async function clearHistory() {
     return apiFetch('/history', { method: 'DELETE' });
 }
 
-/** 进制转换：POST /api/convert */
+/** Converts an integer to another base. */
 async function convertBase(value, fromBase, toBase) {
     return apiFetch('/convert', {
         method: 'POST',

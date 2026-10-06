@@ -1,9 +1,9 @@
-# 系统文件
+# System files
 .DS_Store
 
-# 日志
+# Logs
 *.log
 
-# IDE 配置
+# IDE settings
 .idea/
 .vscode/
