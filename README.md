@@ -14,6 +14,36 @@ This is the frontend of my EE308 calculator project. It uses HTML, CSS and JavaS
 - Conversion between base 2, 8, 10 and 16
 - Keyboard input: Enter to calculate, Backspace to delete and Escape to clear
 
+## How It Works
+
+~~~text
+User input -> API request -> Backend calculation -> Saved history
+           <- Answer and updated history
+~~~
+
+`app.js` reads the buttons and keyboard input. `api.js` sends the expression to the backend using `fetch`. When the answer comes back, the page shows it and loads the latest history. The frontend does not evaluate expressions.
+
+## Using the Calculator
+
+Use the number and operator buttons to enter an expression, then click `=` or press Enter. Use `C` to clear the current expression and the backspace button to remove its last character.
+
+| Expression | Answer |
+|---|---|
+| `1+2*3` | `7` |
+| `(1+2)*3` | `9` |
+| `sqrt(9)+2^3` | `11` |
+| `sin(30)` | `0.5` |
+
+The scientific buttons enter function names for you. Trigonometric functions use degrees.
+
+The history panel shows five records per page. Enter part of an expression or result and click Search to find a record. Delete removes one record. Clear All asks for confirmation before clearing the history.
+
+For base conversion, enter an integer, choose the From and To bases, then click Convert. For example, `255` in Base 10 becomes `FF` in Base 16. The swap button exchanges the two bases.
+
+## Screenshot
+
+![Calculator page with calculation history and base conversion](images/calculator.jpg)
+
 ## Project Structure
 
 - `index.html`: the calculator page
