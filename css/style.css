@@ -6,41 +6,48 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f1f5f9;
+    background: #dbeff6;
     display: flex;
     justify-content: center;
     padding: 40px 16px;
     min-height: 100vh;
 }
 
+/* Two-column layout: the calculator takes the left half of the screen,
+   while history and base conversion stack in the right column. */
 .app {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "calc history"
+        "calc converter";
+    grid-template-rows: 3fr 2fr;
     gap: 24px;
-    flex-wrap: wrap;
-    justify-content: center;
+    align-items: stretch;
     width: 100%;
     max-width: 1120px;
 }
 
 /* Calculator */
 .calculator {
+    grid-area: calc;
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 4px 16px rgba(93, 115, 137, 0.14);
     padding: 24px;
-    width: min(340px, 100%);
+    width: 100%;
 }
 
 .calculator h1 {
     font-size: 20px;
-    color: #0f172a;
+    color: #5d7389;
     margin-bottom: 16px;
     text-align: center;
 }
 
 .display {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: #f0f7fa;
+    border: 1px solid #d7e7ec;
     border-radius: 10px;
     padding: 14px 16px;
     margin-bottom: 16px;
@@ -50,21 +57,21 @@ body {
 
 .expression {
     font-size: 18px;
-    color: #334155;
+    color: #5b6b7c;
     min-height: 26px;
 }
 
 .result {
     font-size: 30px;
     font-weight: 700;
-    color: #0f172a;
+    color: #3d4f63;
     text-align: right;
     margin-top: 4px;
 }
 
 .error {
     font-size: 14px;
-    color: #dc2626;
+    color: #b4555d;
     margin-top: 4px;
     min-height: 18px;
 }
@@ -89,12 +96,12 @@ body {
 }
 
 .btn.sci {
-    background: #ede9fe;
-    color: #6d28d9;
+    background: #dbeff6;
+    color: #3d6a7c;
 }
 
 .btn.sci:hover {
-    background: #ddd6fe;
+    background: #c8e5ef;
 }
 
 .btn {
@@ -103,17 +110,17 @@ body {
     border-radius: 10px;
     font-size: 22px;
     cursor: pointer;
-    background: #f1f5f9;
-    color: #0f172a;
+    background: #eaf3f6;
+    color: #3d4f63;
     transition: background 0.15s;
 }
 
 .btn:hover {
-    background: #e2e8f0;
+    background: #dcebef;
 }
 
 .btn:active {
-    background: #cbd5e1;
+    background: #c5dce3;
 }
 
 .btn:disabled,
@@ -124,39 +131,41 @@ body {
 }
 
 .btn.op {
-    background: #e0f2fe;
-    color: #0369a1;
+    background: #a8d8e3;
+    color: #2e5a68;
 }
 
 .btn.op:hover {
-    background: #bae6fd;
+    background: #93ccd9;
 }
 
 .btn.fn {
-    background: #fef3c7;
-    color: #92400e;
+    background: #c5b8bf;
+    color: #5c4b54;
 }
 
 .btn.fn:hover {
-    background: #fde68a;
+    background: #b8a9b2;
 }
 
 .btn.eq {
-    background: #2563eb;
+    background: #5d7389;
     color: #ffffff;
 }
 
 .btn.eq:hover {
-    background: #1d4ed8;
+    background: #4c6078;
 }
 
 /* History */
 .history {
+    grid-area: history;
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 4px 16px rgba(93, 115, 137, 0.14);
     padding: 24px;
-    width: min(360px, 100%);
+    width: 100%;
+    min-height: 0;
 }
 
 .history-header {
@@ -168,13 +177,13 @@ body {
 
 .history-header h2 {
     font-size: 18px;
-    color: #0f172a;
+    color: #5d7389;
 }
 
 .clear-btn {
-    border: 1px solid #e2e8f0;
+    border: 1px solid #d7e7ec;
     background: #ffffff;
-    color: #475569;
+    color: #5b6b7c;
     padding: 6px 12px;
     border-radius: 8px;
     cursor: pointer;
@@ -182,8 +191,8 @@ body {
 }
 
 .clear-btn:hover {
-    background: #f1f5f9;
-    color: #dc2626;
+    background: #f7ecee;
+    color: #b4555d;
 }
 
 .history-search {
@@ -195,10 +204,10 @@ body {
 .history-search input,
 .converter input,
 .converter select {
-    border: 1px solid #cbd5e1;
+    border: 1px solid #c5d9e2;
     border-radius: 8px;
     padding: 9px 10px;
-    color: #0f172a;
+    color: #3d4f63;
     background: #ffffff;
     min-width: 0;
 }
@@ -210,10 +219,10 @@ body {
 .history-search button,
 .pagination button,
 .swap-btn {
-    border: 1px solid #cbd5e1;
+    border: 1px solid #c5d9e2;
     border-radius: 8px;
     background: #ffffff;
-    color: #334155;
+    color: #5b6b7c;
     padding: 7px 11px;
     cursor: pointer;
 }
@@ -221,7 +230,7 @@ body {
 .history-search button:hover,
 .pagination button:hover:not(:disabled),
 .swap-btn:hover {
-    background: #f1f5f9;
+    background: #f0f7fa;
 }
 
 #history-list {
@@ -235,7 +244,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #eef4f6;
 }
 
 .history-item:last-child {
@@ -244,25 +253,25 @@ body {
 
 .history-math {
     font-size: 14px;
-    color: #334155;
+    color: #5b6b7c;
     line-height: 1.5;
 }
 
 .history-math .history-result {
     font-weight: 700;
-    color: #0f172a;
+    color: #3d4f63;
 }
 
 .history-time {
     font-size: 12px;
-    color: #94a3b8;
+    color: #8aa0ae;
     margin-top: 2px;
 }
 
 .delete-btn {
     border: none;
-    background: #fef2f2;
-    color: #dc2626;
+    background: #f7ecee;
+    color: #b4555d;
     padding: 5px 10px;
     border-radius: 6px;
     cursor: pointer;
@@ -270,17 +279,17 @@ body {
 }
 
 .delete-btn:hover {
-    background: #fee2e2;
+    background: #f0dcdf;
 }
 
 .history-empty {
-    color: #94a3b8;
+    color: #8aa0ae;
     text-align: center;
     padding: 24px 0;
 }
 
 .history-status {
-    color: #64748b;
+    color: #5b6b7c;
     font-size: 13px;
     min-height: 20px;
 }
@@ -290,7 +299,7 @@ body {
     justify-content: space-between;
     gap: 10px;
     margin-top: 12px;
-    color: #64748b;
+    color: #5b6b7c;
     font-size: 13px;
 }
 
@@ -301,23 +310,23 @@ body {
 
 /* Base conversion */
 .converter {
+    grid-area: converter;
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+    box-shadow: 0 4px 16px rgba(93, 115, 137, 0.14);
     padding: 24px;
-    width: min(340px, 100%);
-    align-self: flex-start;
+    width: 100%;
 }
 
 .converter h2 {
     font-size: 18px;
-    color: #0f172a;
+    color: #5d7389;
     margin-bottom: 18px;
 }
 
 .converter > label,
 .base-selectors label {
-    color: #475569;
+    color: #5b6b7c;
     font-size: 13px;
 }
 
@@ -346,13 +355,13 @@ body {
     border-radius: 9px;
     padding: 10px;
     margin-top: 16px;
-    background: #0f766e;
+    background: #5d7389;
     color: #ffffff;
     cursor: pointer;
 }
 
 .convert-btn:hover {
-    background: #115e59;
+    background: #4c6078;
 }
 
 .convert-btn:disabled {
@@ -365,11 +374,23 @@ body {
     padding: 12px;
     min-height: 45px;
     border-radius: 8px;
-    background: #f0fdfa;
-    color: #115e59;
+    background: #eaf4f7;
+    color: #2e5a68;
     font-size: 20px;
     font-weight: 700;
     overflow-wrap: anywhere;
+}
+
+/* On narrow (mobile-sized) screens the panels stack vertically. */
+@media (max-width: 640px) {
+    .app {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "calc"
+            "history"
+            "converter";
+        grid-template-rows: auto;
+    }
 }
 
 @media (max-width: 400px) {
